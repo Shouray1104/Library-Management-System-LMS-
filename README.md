@@ -44,17 +44,20 @@ The system manages students, books, and book issuing operations with proper busi
 
 ## Project Structure
 
+```
 LMS/
 │
 ├── Frontend/
 │
 └── Backend/
+    │
     ├── students/
     ├── books/
     ├── issue_book/
-    └── manage.py
-
----
+    ├── Backend/        # Django project settings folder
+    ├── manage.py
+    └── requirements.txt
+```
 
 ## How to Run Backend Locally
 
