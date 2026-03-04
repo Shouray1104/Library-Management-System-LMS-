@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'students',
     'books',
     'issue_book',
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [
