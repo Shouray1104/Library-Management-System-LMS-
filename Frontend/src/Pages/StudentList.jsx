@@ -1,45 +1,38 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { getStudents } from "../services/studentsApi";
 import "./Pages.css";
 
 const StudentList = () => {
-  const [students] = useState([
-    {
-      id: 1,
-      enrollmentNo: "STU001",
-      studentName: "Arun Kumar",
-      email: "arun@example.com",
-      contact: "9876543210",
-      department: "Computer Science",
-      semester: "5",
-    },
-    {
-      id: 2,
-      enrollmentNo: "STU002",
-      studentName: "Priya Singh",
-      email: "priya@example.com",
-      contact: "9876543211",
-      department: "Information Technology",
-      semester: "4",
-    },
-    {
-      id: 3,
-      enrollmentNo: "STU003",
-      studentName: "Rajesh Patel",
-      email: "rajesh@example.com",
-      contact: "9876543212",
-      department: "Computer Science",
-      semester: "6",
-    },
-  ]);
-
+  const [students, setStudents] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchStudents = async () => {
+      try {
+        setLoading(true);
+        const response = await getStudents();
+        setStudents(response.data);
+        setError(null);
+      } catch (err) {
+        console.error("Error fetching students:", err);
+        setError("Failed to load students. Please try again.");
+        setStudents([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStudents();
+  }, []);
 
   const filteredStudents = students.filter(
     (student) =>
-      student.enrollmentNo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.email.toLowerCase().includes(searchTerm.toLowerCase())
+      student.enrollment_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -66,7 +59,17 @@ const StudentList = () => {
           />
         </div>
 
-        {filteredStudents.length > 0 ? (
+        {error && (
+          <div className="error-message" style={{color: 'red', padding: '10px', marginBottom: '15px', backgroundColor: '#ffe6e6', borderRadius: '4px'}}>
+            ⚠️ {error}
+          </div>
+        )}
+
+        {loading ? (
+          <div className="no-data">
+            <p>⏳ Loading students...</p>
+          </div>
+        ) : filteredStudents.length > 0 ? (
           <div className="table-container">
             <table className="data-table">
               <thead>
@@ -75,20 +78,16 @@ const StudentList = () => {
                   <th>Student Name</th>
                   <th>Email</th>
                   <th>Contact</th>
-                  <th>Department</th>
-                  <th>Semester</th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredStudents.map((student) => (
-                  <tr key={student.id}>
-                    <td>{student.enrollmentNo}</td>
-                    <td>{student.studentName}</td>
+                  <tr key={student.enrollment_number}>
+                    <td>{student.enrollment_number}</td>
+                    <td>{student.name}</td>
                     <td>{student.email}</td>
-                    <td>{student.contact}</td>
-                    <td>{student.department}</td>
-                    <td>{student.semester}</td>
+                    <td>{student.phone_number}</td>
                     <td>
                       <button className="action-icon-btn" title="Edit">
                         ✏️
